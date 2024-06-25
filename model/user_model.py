@@ -7,9 +7,9 @@ class UserModel:
         try:
             self.con = psycopg2.connect(
                 host="localhost",
-                user="your_username",
-                password="your_password",
-                database="firstdb")
+                user="username",
+                password="password",
+                database="db_name")
             self.con.autocommit=True
             self.cur=self.con.cursor(dictionary=True)
             print("Connection Successful")
@@ -60,10 +60,10 @@ class UserModel:
             self.cur.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = self.cur.fetchone()
             if user:
-                # user[3] assumes the password is the 4th column
+               # Check if the password matches
                 password_match = bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8'))
                 if password_match:
-                    return {"status": "success", "name": user[1]}  # user[1] assumes the name is the 2nd column
+                    return {"status": "success", "name": user[1]}  
                 else:
                     return {"status": "error", "message": "Invalid email or password"}
             else:
