@@ -1,17 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask
+
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# @app.route('/register')
-# def reg():
-#     return render_template('register.html')
+from controller import *
 
-# @app.route('/login')
-# def login():
-#     return render_template('login.html')
-
-from controller import user_controller
 

@@ -7,11 +7,11 @@ class UserModel:
         try:
             self.con = psycopg2.connect(
                 host="localhost",
-                user="username",
-                password="password",
-                database="db_name")
+                user="postgres",
+                password="sai@4080",
+                database="postgres")
             self.con.autocommit=True
-            self.cur=self.con.cursor(dictionary=True)
+            self.cur=self.con.cursor()
             print("Connection Successful")
         except Exception as e:
             print("Error in connection:", e)    
@@ -39,20 +39,19 @@ class UserModel:
                 return "Password doesn't match 😢..."
             
             # Hash the password
-            hash_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
+            # hash_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
             
             # Insert the new user into the database
             self.cur.execute(
                 "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
-                (data['name'], data['email'], hash_password)
+                (data['name'], data['email'], data['password'])
             )
             self.con.commit()
             return "User Added Successfully"
         
         except Exception as e:
             print("Error:", e)
-            return "An error occurred" 
-        
+            return "An error occurred"
 
     def login_user(self, email, password):
         try:
@@ -60,10 +59,9 @@ class UserModel:
             self.cur.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = self.cur.fetchone()
             if user:
-               # Check if the password matches
-                password_match = bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8'))
-                if password_match:
-                    return {"status": "success", "name": user[1]}  
+                # Directly compare passwords (not recommended in production)
+                if password == user[3]:  # Assuming user[3] is the hashed password from the database
+                    return {"status": "success", "name": user[1]}
                 else:
                     return {"status": "error", "message": "Invalid email or password"}
             else:
@@ -71,5 +69,7 @@ class UserModel:
         except Exception as e:
             print("Error:", e)
             return {"status": "error", "message": "Internal server error"}
+
+
 
          
