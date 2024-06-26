@@ -1,6 +1,5 @@
 import psycopg2
 import json
-import bcrypt
 
 class UserModel:
     def __init__(self):
