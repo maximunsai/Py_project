@@ -7,22 +7,40 @@ class UserModel:
             self.con = psycopg2.connect(
                 host="localhost",
                 user="postgres",
-                password="sai@4080",
-                database="postgres")
-            self.con.autocommit=True
-            self.cur=self.con.cursor()
+                password="mysecretpassword",
+                database="postgres",
+                port=5432
+            )
+            self.con.autocommit = True
+            self.cur = self.con.cursor()
             print("Connection Successful")
+            # Create the table if it does not exist
+            self.create_table()
         except Exception as e:
-            print("Error in connection:", e)    
+            print("Error in connection:", e)
+
+    def create_table(self):
+        create_table_query = '''
+        CREATE TABLE IF NOT EXISTS users (
+            s_no SERIAL PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            email VARCHAR(255) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL
+        );
+        '''
+        try:
+            self.cur.execute(create_table_query)
+            print("Table 'users' created successfully.")
+        except Exception as e:
+            print("Error creating table:", e)
 
     def getAllUsers(self):
         self.cur.execute("SELECT * FROM users")
         result = self.cur.fetchall()
-        if len(result)>0:
+        if len(result) > 0:
             return json.dumps(result)
         else:
             return "No Data Found"
-
 
     def addUser(self, data):
         try:
@@ -37,7 +55,7 @@ class UserModel:
             if data['password'] != data['ConfirmPassword']:
                 return "Password doesn't match 😢..."
             
-            # Hash the password
+            # Hash the password (consider using a hashing library like bcrypt)
             # hash_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
             
             # Insert the new user into the database
@@ -59,7 +77,7 @@ class UserModel:
             user = self.cur.fetchone()
             if user:
                 # Directly compare passwords (not recommended in production)
-                if password == user[3]:  # Assuming user[3] is the hashed password from the database
+                if password == user[3]:  # Assuming user[3] is the password from the database
                     return {"status": "success", "name": user[1]}
                 else:
                     return {"status": "error", "message": "Invalid email or password"}
@@ -68,7 +86,3 @@ class UserModel:
         except Exception as e:
             print("Error:", e)
             return {"status": "error", "message": "Internal server error"}
-
-
-
-         
