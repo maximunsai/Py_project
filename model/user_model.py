@@ -1,16 +1,15 @@
 import psycopg2
 import json
-
+import os
 class UserModel:
     def __init__(self):
         try:
             self.con = psycopg2.connect(
-                host="my_postgres",
-                user="postgres",
-                password="mysecretpassword",
-                database="postgres",
-                port=5432
-            )
+                host=os.getenv('DATABASE_HOST', 'my_postgres'),
+                user=os.getenv('DATABASE_USER', 'myuser'),
+                password=os.getenv('DATABASE_PASSWORD', 'mypassword'),
+                dbname=os.getenv('DATABASE_NAME', 'mydatabase')
+)
             self.con.autocommit = True
             self.cur = self.con.cursor()
             print("Connection Successful")
