@@ -5,7 +5,7 @@ class UserModel:
     def __init__(self):
         try:
             self.con = psycopg2.connect(
-                host="localhost",
+                host="postgres",
                 user="postgres",
                 password="mysecretpassword",
                 database="postgres",
